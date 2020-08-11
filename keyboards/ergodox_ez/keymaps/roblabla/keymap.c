@@ -41,7 +41,80 @@ enum custom_keycodes {
   FR_WEIRD_C,
   FR_WEIRD_A,
   FR_WEIRD_U,
+  OS_CYCLE,
 };
+
+// Special key handling.
+enum SPECIAL_KEYCODE {
+  KEYCODE_C,
+  KEYCODE_A,
+  KEYCODE_E_LEFT,
+  KEYCODE_E_RIGHT,
+  KEYCODE_E_HAT,
+  KEYCODE_U,
+};
+
+const uint8_t win_keys[] = {
+  [KEYCODE_C] = 135,
+  [KEYCODE_A] = 133,
+  [KEYCODE_E_LEFT] = 130,
+  [KEYCODE_E_RIGHT] = 138,
+  [KEYCODE_E_HAT] = 136,
+  [KEYCODE_U] = 151,
+};
+
+// TODO: OSX Keys
+
+const char *unicode_keys[] = {
+  [KEYCODE_C] = "ç",
+  [KEYCODE_A] = "à",
+  [KEYCODE_E_LEFT] = "é",
+  [KEYCODE_E_RIGHT] = "è",
+  [KEYCODE_E_HAT] = "ê",
+  [KEYCODE_U] = "ù",
+};
+
+enum os {
+  Windows,
+  MacOS,
+  Linux,
+  OS_END
+};
+
+static enum os OS_TY = Windows;
+
+static void tap_keypad_digit(uint8_t digit) {
+  if (digit == 0)
+    tap_code(KC_KP_0);
+  else
+    tap_code(KC_KP_1 + digit - 1);
+}
+
+static void press_key_win(uint8_t code) {
+  register_code(KC_LALT);
+  tap_keypad_digit(code / 100);
+  tap_keypad_digit((code / 10) % 10);
+  tap_keypad_digit(code % 10);
+  unregister_code(KC_LALT);
+}
+
+static void press_key(enum SPECIAL_KEYCODE keycode) {
+  switch (OS_TY) {
+    case Windows:
+      if (keycode >= sizeof(win_keys) / sizeof(win_keys[0]))
+        return;
+      press_key_win(win_keys[keycode]);
+      return;
+    case MacOS:
+    case Linux:
+      if (keycode >= sizeof(unicode_keys) / sizeof(unicode_keys[0]))
+        return;
+      send_unicode_string(unicode_keys[keycode]);
+      return;
+    default:
+      return;
+  }
+}
 
 // Custom tap dance declarations
 enum {
@@ -50,23 +123,11 @@ enum {
 
 static void td_e_key(qk_tap_dance_state_t *state, void *user_data) {
   if (state->count == 1) {
-    register_code(KC_LALT);
-    tap_code(KC_KP_1);
-    tap_code(KC_KP_3);
-    tap_code(KC_KP_0);
-    unregister_code(KC_LALT);
+    press_key(KEYCODE_E_LEFT);
   } else if (state->count == 2) {
-    register_code(KC_LALT);
-    tap_code(KC_KP_1);
-    tap_code(KC_KP_3);
-    tap_code(KC_KP_8);
-    unregister_code(KC_LALT);
+    press_key(KEYCODE_E_RIGHT);
   } else if (state->count == 3) {
-    register_code(KC_LALT);
-    tap_code(KC_KP_1);
-    tap_code(KC_KP_3);
-    tap_code(KC_KP_6);
-    unregister_code(KC_LALT);
+    press_key(KEYCODE_E_HAT);
   }
   reset_tap_dance(state);
 }
@@ -116,7 +177,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                                                                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
                                                                                                     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
                                                                                                                     KC_TRANSPARENT, KC_TRANSPARENT,
-                                                                                    KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT
+                                                                                    KC_TRANSPARENT,       OS_CYCLE, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT
   ),
   // Gaming layer
   [4] = LAYOUT_ergodox_pretty(
@@ -137,29 +198,22 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
     case FR_WEIRD_C:
       if (record->event.pressed) {
-        register_code(KC_LALT);
-        tap_code(KC_KP_1);
-        tap_code(KC_KP_3);
-        tap_code(KC_KP_5);
-        unregister_code(KC_LALT);
+        press_key(KEYCODE_C);
       }
       return false;
     case FR_WEIRD_A:
       if (record->event.pressed) {
-        register_code(KC_LALT);
-        tap_code(KC_KP_1);
-        tap_code(KC_KP_3);
-        tap_code(KC_KP_3);
-        unregister_code(KC_LALT);
+        press_key(KEYCODE_A);
       }
       return false;
     case FR_WEIRD_U:
       if (record->event.pressed) {
-        register_code(KC_LALT);
-        tap_code(KC_KP_1);
-        tap_code(KC_KP_5);
-        tap_code(KC_KP_1);
-        unregister_code(KC_LALT);
+        press_key(KEYCODE_U);
+      }
+      return false;
+    case OS_CYCLE:
+      if (record->event.pressed) {
+        OS_TY = (OS_TY + 1) % OS_END;
       }
       return false;
     case RGB_SLD:
