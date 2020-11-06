@@ -33,6 +33,10 @@
 #define LSA_T(kc) MT(MOD_LSFT | MOD_LALT, kc)
 #define BP_NDSH_MAC ALGR(KC_8)
 
+// Workaround moonlander bug
+
+extern bool mcp23018_leds[3];
+
 enum custom_keycodes {
   RGB_SLD = ML_SAFE_RANGE,
   HSV_172_255_255,
