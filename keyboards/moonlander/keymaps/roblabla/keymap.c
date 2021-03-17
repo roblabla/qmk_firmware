@@ -85,6 +85,12 @@ enum os {
   OS_END
 };
 
+static char KEY_TO_BLINK[3] = {
+  [Windows] = 11,
+  [MacOS] = 7,
+  [Linux] = 48,
+};
+
 static enum os OS_TY = Windows;
 static char BLINK = 0;
 static uint32_t CHANGE_TICK = 0;
@@ -188,26 +194,26 @@ void rgb_matrix_indicators_user(void) {
 
   uint16_t delta = timer_elapsed32(CHANGE_TICK);
 
-  if (BLINK && delta > 5000)
+  if (BLINK && delta > 5000) {
     BLINK = 0;
-
-  int led_to_blink;
-  switch (OS_TY) {
-    case Windows:
-      led_to_blink = 32;
-      break;
-    case MacOS:
-      led_to_blink = 16;
-      break;
-    default:
-      led_to_blink = 13;
-      break;
+    for (int i = 0; i < sizeof(KEY_TO_BLINK); i++) {
+      rgb_matrix_set_color( KEY_TO_BLINK[i], 0, 0, 0 );
+    }
+    return;
   }
 
   if (delta % 2500 < 1250) {
-    rgb_matrix_set_color( led_to_blink, 255, 255, 255 );
+    for (int i = 0; i < sizeof(KEY_TO_BLINK); i++) {
+      if (i == OS_TY) {
+        rgb_matrix_set_color( KEY_TO_BLINK[i], 255, 255, 255 );
+      } else {
+        rgb_matrix_set_color( KEY_TO_BLINK[i], 0, 0, 0 );
+      }
+    }
   } else {
-    rgb_matrix_set_color( led_to_blink, 0, 0, 0 );
+    for (int i = 0; i < sizeof(KEY_TO_BLINK); i++) {
+      rgb_matrix_set_color( KEY_TO_BLINK[i], 0, 0, 0 );
+    }
   }
 }
 
