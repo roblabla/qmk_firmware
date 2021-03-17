@@ -50,32 +50,32 @@ enum custom_keycodes {
 
 // Special key handling.
 enum SPECIAL_KEYCODE {
-  KEYCODE_C,
-  KEYCODE_A,
-  KEYCODE_E_LEFT,
-  KEYCODE_E_RIGHT,
-  KEYCODE_E_HAT,
-  KEYCODE_U,
+  KEYCODE_C_LOWER,
+  KEYCODE_A_LOWER,
+  KEYCODE_E_LEFT_LOWER,
+  KEYCODE_E_RIGHT_LOWER,
+  KEYCODE_E_HAT_LOWER,
+  KEYCODE_U_LOWER,
 };
 
 const uint8_t win_keys[] = {
-  [KEYCODE_C] = 135,
-  [KEYCODE_A] = 133,
-  [KEYCODE_E_LEFT] = 130,
-  [KEYCODE_E_RIGHT] = 138,
-  [KEYCODE_E_HAT] = 136,
-  [KEYCODE_U] = 151,
+  [KEYCODE_C_LOWER] = 135,
+  [KEYCODE_A_LOWER] = 133,
+  [KEYCODE_E_LEFT_LOWER] = 130,
+  [KEYCODE_E_RIGHT_LOWER] = 138,
+  [KEYCODE_E_HAT_LOWER] = 136,
+  [KEYCODE_U_LOWER] = 151,
 };
 
 // TODO: OSX Keys
 
 const char *unicode_keys[] = {
-  [KEYCODE_C] = "ç",
-  [KEYCODE_A] = "à",
-  [KEYCODE_E_LEFT] = "é",
-  [KEYCODE_E_RIGHT] = "è",
-  [KEYCODE_E_HAT] = "ê",
-  [KEYCODE_U] = "ù",
+  [KEYCODE_C_LOWER] = "ç",
+  [KEYCODE_A_LOWER] = "à",
+  [KEYCODE_E_LEFT_LOWER] = "é",
+  [KEYCODE_E_RIGHT_LOWER] = "è",
+  [KEYCODE_E_HAT_LOWER] = "ê",
+  [KEYCODE_U_LOWER] = "ù",
 };
 
 enum os {
@@ -135,11 +135,11 @@ enum {
 
 static void td_e_key(qk_tap_dance_state_t *state, void *user_data) {
   if (state->count == 1) {
-    press_key(KEYCODE_E_LEFT);
+    press_key(KEYCODE_E_LEFT_LOWER);
   } else if (state->count == 2) {
-    press_key(KEYCODE_E_RIGHT);
+    press_key(KEYCODE_E_RIGHT_LOWER);
   } else if (state->count == 3) {
-    press_key(KEYCODE_E_HAT);
+    press_key(KEYCODE_E_HAT_LOWER);
   }
   reset_tap_dance(state);
 }
@@ -221,17 +221,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
     case FR_WEIRD_C:
       if (record->event.pressed) {
-        press_key(KEYCODE_C);
+        press_key(KEYCODE_C_LOWER);
       }
       return false;
     case FR_WEIRD_A:
       if (record->event.pressed) {
-        press_key(KEYCODE_A);
+        press_key(KEYCODE_A_LOWER);
       }
       return false;
     case FR_WEIRD_U:
       if (record->event.pressed) {
-        press_key(KEYCODE_U);
+        press_key(KEYCODE_U_LOWER);
       }
       return false;
     case OS_CYCLE:
